@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Flights_Serve.Aplication
 {
-    public class FlighService : IFlightService
+    public class FlighService : IFlightService, IFlightServiceCreated, IFlightserviceUpd, IFlightserviceDeleated
     {
         private readonly FlightsContexts _context;
 
@@ -30,7 +30,8 @@ namespace Flights_Serve.Aplication
                 f.Id,
                 f.Origin,
                 f.Destination,
-                Price = f.price,
+                f.Price,
+                f.Type,
                 Transport = new
                 {
                     f.FlightCarrier,
@@ -47,7 +48,8 @@ namespace Flights_Serve.Aplication
 
             existingFlight.Origin = flights.Origin;
             existingFlight.Destination = flights.Destination;
-            existingFlight.price = flights.price;
+            existingFlight.Price = flights.Price;
+            existingFlight.Type = flights.Type;
             existingFlight.FlightCarrier = flights.FlightCarrier;
             existingFlight.FlightNumber = flights.FlightNumber;
 

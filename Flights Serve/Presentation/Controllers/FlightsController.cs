@@ -14,20 +14,30 @@ namespace Flights_Serve.Presentation.Controllers
     {
         private readonly FlightsContexts _context;
         private readonly IFlightService _flightService;
+        private readonly IFlightServiceCreated _flightServiceCreate;
+        private readonly IFlightserviceUpd _flightServiceUpd;
+        private readonly IFlightserviceDeleated _flightServiceDeleated;
 
-        public FlightsController(FlightsContexts context, IFlightService flightService)
+
+
+        public FlightsController(FlightsContexts context, IFlightService flightService,
+        IFlightServiceCreated flightServiceCreate, IFlightserviceUpd flightServiceUpd, 
+        IFlightserviceDeleated flightServiceDeleated)
         {
             _context = context;
             _flightService = flightService;
+            _flightServiceCreate = flightServiceCreate;
+            _flightServiceUpd = flightServiceUpd;
+            _flightServiceDeleated = flightServiceDeleated;
         }
 
-        //[HttpPost]
-        //[Route("Created")]
-        //public async Task<IActionResult> CreatedFlight(Flights flights)
-        //{
-        //    var result = await _flightService.CreateFlightAsync(flights);
-        //    return Ok(result);
-        //}
+        [HttpPost]
+        [Route("Created")]
+        public async Task<IActionResult> CreatedFlight(Flights flights)
+        {
+            var result = await _flightServiceCreate.CreateFlightAsync(flights);
+            return Ok(result);
+        }
 
         [HttpGet]
         [Route("List")]
@@ -37,20 +47,20 @@ namespace Flights_Serve.Presentation.Controllers
             return Ok(result);
         }
 
-    //    [HttpPut]
-    //    [Route("Updated/{id}")]
-    //    public async Task<ActionResult> UpdateFlights(int id, Flights flights)
-    //    {
-    //        var result = await _flightService.UpdateFlightAsync(id, flights);
-    //        return Ok(result);
-    //    }
+        [HttpPut]
+        [Route("Updated/{id}")]
+        public async Task<ActionResult> updateflights(int id, Flights flights)
+        {
+            var result = await _flightServiceUpd.UpdateFlightAsync(id, flights);
+            return Ok(result);
+        }
 
-    //    [HttpDelete]
-    //    [Route("Delete/{id}")]
-    //    public async Task<ActionResult> DeleteFlights(int id)
-    //    {
-    //        var result = await _flightService.DeleteFlightAsync(id);
-    //        return Ok(result);
-    //    }
+        [HttpDelete]
+        [Route("delete/{id}")]
+        public async Task<ActionResult> DeleteFlights(int id)
+        {
+            var result = await _flightServiceDeleated.DeleteFlightAsync(id);
+            return Ok(result);
+        }
     }
 }

@@ -16,12 +16,16 @@ namespace Flights_Serve
             builder.Services.AddControllers();
             builder.Services.AddDbContext<FlightsContexts>(o =>
             {
-                o.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+                o.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddScoped<IFlightService, FlighService>();
+            builder.Services.AddScoped<IFlightServiceCreated, FlighService>();
+            builder.Services.AddScoped<IFlightserviceUpd, FlighService>();
+            builder.Services.AddScoped<IFlightserviceDeleated, FlighService>();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

@@ -17,7 +17,11 @@ namespace Flights_Serve.Domain.Models
 
         [Column(TypeName = "decimal (18,2)")]
         [DisplayFormat(DataFormatString = "0:C2")]
-        public decimal price { get; set; }
+        public decimal Price { get; set; }
+
+        [MaxLength(50, ErrorMessage = "The field has exceeded the character limit")]
+        [MinLength(1, ErrorMessage = "The field does not meet the minimum number of characters")]
+        public string Type { get; set; } = null;
 
         [MaxLength(50, ErrorMessage = "The field has exceeded the character limit")]
         [MinLength(1, ErrorMessage = "The field does not meet the minimum number of characters")]
