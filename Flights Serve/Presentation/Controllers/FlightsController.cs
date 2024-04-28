@@ -17,18 +17,20 @@ namespace Flights_Serve.Presentation.Controllers
         private readonly IFlightServiceCreated _flightServiceCreate;
         private readonly IFlightserviceUpd _flightServiceUpd;
         private readonly IFlightserviceDeleated _flightServiceDeleated;
+        private readonly IFlightserviceFile _flightServiceFile;
 
 
 
         public FlightsController(FlightsContexts context, IFlightService flightService,
         IFlightServiceCreated flightServiceCreate, IFlightserviceUpd flightServiceUpd, 
-        IFlightserviceDeleated flightServiceDeleated)
+        IFlightserviceDeleated flightServiceDeleated, IFlightserviceFile flightServiceFile)
         {
             _context = context;
             _flightService = flightService;
             _flightServiceCreate = flightServiceCreate;
             _flightServiceUpd = flightServiceUpd;
             _flightServiceDeleated = flightServiceDeleated;
+            _flightServiceFile = flightServiceFile;
         }
 
         [HttpPost]
@@ -39,11 +41,11 @@ namespace Flights_Serve.Presentation.Controllers
             return Ok(result);
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("List")]
-        public async Task<ActionResult> ListRegisters()
+        public async Task<ActionResult> ListRegisters(string Origin = null, string Destination = null, decimal? Price = null, string Type = null, string FlightCarrier = null, string FlightNumber = null)
         {
-            var result = await _flightService.GetFlightsAsync();
+            var result = await _flightService.GetFilteredFlightsAsync(Origin, Destination, Price, Type, FlightCarrier, FlightNumber);
             return Ok(result);
         }
 
@@ -62,5 +64,13 @@ namespace Flights_Serve.Presentation.Controllers
             var result = await _flightServiceDeleated.DeleteFlightAsync(id);
             return Ok(result);
         }
+        [HttpPost]
+        [Route("FileFlight")]
+        public async Task<ActionResult> FileFlights(IFormFile file)
+        {
+            var result = await _flightServiceFile.FileFlightAsync(file);
+            return Ok(result);
+        }
+
     }
 }

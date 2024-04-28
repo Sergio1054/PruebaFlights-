@@ -5,8 +5,9 @@ namespace Flights_Serve.Aplication
 {
     public interface IFlightService
     {
-          Task<List<object>> GetFlightsAsync();
+        Task<List<object>> GetFilteredFlightsAsync(string Origin = null, string Destination = null, decimal? Price = null, string Type = null, string FlightCarrier = null, string FlightNumber = null);
     }
+
     public interface IFlightServiceCreated
     {
         Task<string> CreateFlightAsync(Flights flights);
@@ -19,6 +20,11 @@ namespace Flights_Serve.Aplication
     public interface IFlightserviceDeleated
     {
         Task<string> DeleteFlightAsync(int id);
+    }
+
+    public interface IFlightserviceFile
+    {
+        Task<string> FileFlightAsync(IFormFile file);
     }
 
 }

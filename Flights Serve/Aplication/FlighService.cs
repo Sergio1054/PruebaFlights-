@@ -1,4 +1,6 @@
-﻿using Flights_Serve.Domain.Models;
+﻿using Azure.Core;
+using Flights_Serve.Domain.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,9 +8,11 @@ using System.Threading.Tasks;
 
 namespace Flights_Serve.Aplication
 {
-    public class FlighService : IFlightService, IFlightServiceCreated, IFlightserviceUpd, IFlightserviceDeleated
+    public class FlighService : IFlightService, IFlightServiceCreated, IFlightserviceUpd, IFlightserviceDeleated, IFlightserviceFile
     {
         private readonly FlightsContexts _context;
+        public readonly IWebHostEnvironment _hostingEnvironment;
+
 
         public FlighService(FlightsContexts context)
         {
@@ -17,14 +21,61 @@ namespace Flights_Serve.Aplication
 
         public async Task<string> CreateFlightAsync(Flights flights)
         {
-            await _context.Flights.AddAsync(flights);
-            await _context.SaveChangesAsync();
-            return "record created successfully";
+            try {
+
+                await _context.Flights.AddAsync(flights);
+                await _context.SaveChangesAsync();
+                return "record created successfully";
+
+            }catch (Exception ex)
+            {
+                // Capturar la excepción interna y devolver su mensaje
+                string innerErrorMessage = ex.InnerException != null ? ex.InnerException.Message : "";
+                return $"Error al insertar: {ex.Message}. Detalles: {innerErrorMessage}";
+            }
         }
 
-        public async Task<List<object>> GetFlightsAsync()
+        public async Task<List<object>> GetFilteredFlightsAsync(string Origin = null, string Destination = null, decimal? Price = null, string Type = null, string FlightCarrier = null, string FlightNumber = null)
         {
-            var flights = await _context.Flights.ToListAsync();
+            var query = _context.Flights.AsQueryable();
+
+
+            if (!string.IsNullOrEmpty(Origin))
+            {
+                query = query.Where(f => f.Origin == Origin);
+            }
+
+            if (!string.IsNullOrEmpty(Destination))
+            {
+                query = query.Where(f => f.Destination == Destination);
+            }
+
+            if (Price.HasValue)
+            {
+                query = query.Where(f => f.Price >= Price.Value);
+            }
+
+            if (!string.IsNullOrEmpty(Type))
+            {
+                query = query.Where(f => f.Type == Type);
+            }
+
+            if (!string.IsNullOrEmpty(FlightCarrier))
+            {
+                query = query.Where(f => f.FlightCarrier == FlightCarrier);
+            }
+
+            if (!string.IsNullOrEmpty(FlightNumber))
+            {
+                decimal flightNumberDecimal;
+                if (decimal.TryParse(FlightNumber, out flightNumberDecimal))
+                {
+                    query = query.Where(f => f.FlightNumber == flightNumberDecimal);
+                }
+            }
+
+            var flights = await query.ToListAsync();
+
             return flights.Select(f => new
             {
                 f.Id,
@@ -42,6 +93,9 @@ namespace Flights_Serve.Aplication
 
         public async Task<string> UpdateFlightAsync(int id, Flights flights)
         {
+            try
+            { 
+
             var existingFlight = await _context.Flights.FindAsync(id);
             if (existingFlight == null)
                 return "Flight not found";
@@ -56,18 +110,58 @@ namespace Flights_Serve.Aplication
             await _context.SaveChangesAsync();
 
             return "record updated successfully";
+
+            }catch (Exception ex)
+            {
+                return $"Error al actualizar: {ex.Message}";
+            }
         }
 
         public async Task<string> DeleteFlightAsync(int id)
         {
-            var existingFlight = await _context.Flights.FindAsync(id);
-            if (existingFlight == null)
-                return "Flight not found";
+            try {
+                var existingFlight = await _context.Flights.FindAsync(id);
+                if (existingFlight == null)
+                    return "Flight not found";
 
-            _context.Flights.Remove(existingFlight);
-            await _context.SaveChangesAsync();
+                _context.Flights.Remove(existingFlight);
+                await _context.SaveChangesAsync();
 
-            return "record deleted successfully";
+                return "record deleted successfully";
+            } catch (Exception ex) {
+                return $"Error al eliminar: {ex.Message}";
+            }
         }
+
+        public async Task<string> FileFlightAsync(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return "No se proporcionó ningún archivo.";
+            }
+
+            try
+            {
+                // Leer el contenido del archivo
+                using (var memoryStream = new MemoryStream())
+                {
+                    await file.CopyToAsync(memoryStream);
+                    byte[] fileBytes = memoryStream.ToArray();
+
+                    // Guardar el archivo en la ubicación deseada
+                    var fileName = Path.GetFileName(file.FileName);
+                    var filePath = Path.Combine(_hostingEnvironment.ContentRootPath, "Infrastructure", "JsonDataBase", fileName);
+                    await File.WriteAllBytesAsync(filePath, fileBytes);
+
+                    // Devolver información sobre el archivo subido
+                    return $"Archivo '{fileName}' subido exitosamente.";
+                }
+            }
+            catch (Exception ex)
+            {
+                return $"Error al subir el archivo: {ex.Message}";
+            }
+        }
+
     }
 }

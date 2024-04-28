@@ -25,6 +25,7 @@ namespace Flights_Serve
             builder.Services.AddScoped<IFlightServiceCreated, FlighService>();
             builder.Services.AddScoped<IFlightserviceUpd, FlighService>();
             builder.Services.AddScoped<IFlightserviceDeleated, FlighService>();
+            builder.Services.AddScoped<IFlightserviceFile, FlighService>();
 
             var app = builder.Build();
 
