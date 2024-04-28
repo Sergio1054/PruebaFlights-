@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Flights_Serve.Aplication
 {
-    public class FlighService : IFlightService, IFlightServiceCreated, IFlightserviceUpd, IFlightserviceDeleated, IFlightserviceFile
+    public class FlighService : IFlightService, IFlightServiceCreated, IFlightserviceUpd, IFlightserviceDeleated
     {
         private readonly FlightsContexts _context;
         public readonly IWebHostEnvironment _hostingEnvironment;
@@ -133,35 +133,6 @@ namespace Flights_Serve.Aplication
             }
         }
 
-        public async Task<string> FileFlightAsync(IFormFile file)
-        {
-            if (file == null || file.Length == 0)
-            {
-                return "No se proporcionó ningún archivo.";
-            }
-
-            try
-            {
-                // Leer el contenido del archivo
-                using (var memoryStream = new MemoryStream())
-                {
-                    await file.CopyToAsync(memoryStream);
-                    byte[] fileBytes = memoryStream.ToArray();
-
-                    // Guardar el archivo en la ubicación deseada
-                    var fileName = Path.GetFileName(file.FileName);
-                    var filePath = Path.Combine(_hostingEnvironment.ContentRootPath, "Infrastructure", "JsonDataBase", fileName);
-                    await File.WriteAllBytesAsync(filePath, fileBytes);
-
-                    // Devolver información sobre el archivo subido
-                    return $"Archivo '{fileName}' subido exitosamente.";
-                }
-            }
-            catch (Exception ex)
-            {
-                return $"Error al subir el archivo: {ex.Message}";
-            }
-        }
 
     }
 }

@@ -22,9 +22,4 @@ namespace Flights_Serve.Aplication
         Task<string> DeleteFlightAsync(int id);
     }
 
-    public interface IFlightserviceFile
-    {
-        Task<string> FileFlightAsync(IFormFile file);
-    }
-
 }

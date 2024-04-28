@@ -17,20 +17,17 @@ namespace Flights_Serve.Presentation.Controllers
         private readonly IFlightServiceCreated _flightServiceCreate;
         private readonly IFlightserviceUpd _flightServiceUpd;
         private readonly IFlightserviceDeleated _flightServiceDeleated;
-        private readonly IFlightserviceFile _flightServiceFile;
-
 
 
         public FlightsController(FlightsContexts context, IFlightService flightService,
         IFlightServiceCreated flightServiceCreate, IFlightserviceUpd flightServiceUpd, 
-        IFlightserviceDeleated flightServiceDeleated, IFlightserviceFile flightServiceFile)
+        IFlightserviceDeleated flightServiceDeleated)
         {
             _context = context;
             _flightService = flightService;
             _flightServiceCreate = flightServiceCreate;
             _flightServiceUpd = flightServiceUpd;
             _flightServiceDeleated = flightServiceDeleated;
-            _flightServiceFile = flightServiceFile;
         }
 
         [HttpPost]
@@ -64,13 +61,7 @@ namespace Flights_Serve.Presentation.Controllers
             var result = await _flightServiceDeleated.DeleteFlightAsync(id);
             return Ok(result);
         }
-        [HttpPost]
-        [Route("FileFlight")]
-        public async Task<ActionResult> FileFlights(IFormFile file)
-        {
-            var result = await _flightServiceFile.FileFlightAsync(file);
-            return Ok(result);
-        }
+        
 
     }
 }
